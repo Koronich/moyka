@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Client;
 use App\Cars;
+use App\Client;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
@@ -19,12 +19,14 @@ class ClientController extends Controller
         $client->name = $request->name;
         $client->phone = $request->phone;
         $client->save();
+
         return redirect()->route('profile', $client->id);
     }
 
     public function edit(Request $request)
     {
         $client = Client::where('id', $request->id)->first();
+
         return view('pages.editclient', [
             'client' => $client,
             'id' => $request->id
@@ -37,6 +39,7 @@ class ClientController extends Controller
             'name' => $request->name,
             'phone' => $request->phone
         ]);
+
         return redirect()->route('profile', $request->id);
     }
 

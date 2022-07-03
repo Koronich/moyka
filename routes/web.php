@@ -31,7 +31,7 @@ Route::post('updateclientpost', 'ClientController@update')->name('updateclientpo
 Route::get('updateclient/{id}', 'ClientController@edit')->name('updateclient');
 Route::get('newclient', 'ClientController@index')->name('newclient');
 Route::post('newclientpost', 'ClientController@store')->name('newclientpost');
-Route::post('find','ClientController@find')->name('find');
+Route::post('find', 'ClientController@find')->name('find');
 
 
 // Машина

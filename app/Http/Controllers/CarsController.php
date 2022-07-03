@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Cars;
+use Illuminate\Http\Request;
 
 class CarsController extends Controller
 {
     public function add(Request $request)
     {
         $client_id = $request->id;
+
         return view('pages.addcar', [
             'client_id' => $client_id
         ]);
@@ -20,7 +21,7 @@ class CarsController extends Controller
         if ($request->file('image') != null) {
             $path = $request->file('image')->store('uploads', 'public');
         } else {
-            $path = ' ';
+            $path = '';
         }
         $cars = new Cars;
         $cars->number = $request->number;
@@ -29,6 +30,7 @@ class CarsController extends Controller
         $cars->marka = $request->marka;
         $cars->type = $request->type;
         $cars->save();
+
         return redirect()->route('profile', $request->client_id);
     }
 }

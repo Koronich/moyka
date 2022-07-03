@@ -2,34 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Client;
 use App\Cars;
+use App\Client;
+use App\Orders;
 use App\Uslugi;
 use App\Wokers;
-use App\Orders;
 use DB;
+use Illuminate\Http\Request;
+
 class OrdersController extends Controller
 {
-    public function start() {
-    	return view('pages.start');
+    public function start()
+    {
+        return view('pages.start');
     }
-    public function choose() {
-    	return view('pages.choose');
+
+    public function choose()
+    {
+        return view('pages.choose');
     }
-    public function profile(Request $request) {
-    	$client = Client::where('id', $request->id)->get();
-    	$cars = Cars::where('client_id', $request->id)->get();
-    	return view('pages.profile', [
-    		'client' => $client,
-    		'cars' => $cars
-    	]);
+
+    public function profile(Request $request)
+    {
+        $client = Client::where('id', $request->id)->get();
+        $cars = Cars::where('client_id', $request->id)->get();
+
+        return view('pages.profile', [
+            'client' => $client,
+            'cars' => $cars
+        ]);
     }
-    public function index(Request $request) {
+
+    public function index(Request $request)
+    {
         $uslugi = Uslugi::all();
         $wokers = Wokers::all();
         $id = $request->id;
         $car = $request->car;
+
         return view('pages.order', [
             'uslugi' => $uslugi,
             'id' => $id,
@@ -37,12 +47,14 @@ class OrdersController extends Controller
             'wokers' => $wokers
         ]);
     }
-    public function make(Request $request) {
+
+    public function make(Request $request)
+    {
         $data = [];
         $findusluga = Uslugi::all();
 
         foreach ($findusluga as $value) {
-            if (isset($_POST['usluga_'.$value->id])) {
+            if (isset($_POST['usluga_' . $value->id])) {
                 $data[] = $value->id;
             }
         }
@@ -56,7 +68,7 @@ class OrdersController extends Controller
         $client = Client::where('id', $id)->first();
         $woker = Wokers::where('id', $woker)->first();
         $usluga = Uslugi::whereIn('id', $data)->get();
-        $time = date("H:i:s", strtotime("+3 hours"));  
+        $time = date("H:i:s", strtotime("+3 hours"));
         $start = strtotime('20:00:00');
         $end = strtotime('9:00:00');
         $time_now = strtotime($time);
@@ -79,7 +91,7 @@ class OrdersController extends Controller
                 }
                 if ($type == 5) {
                     $price += $value->price_1_4;
-                }   
+                }
             }
             if ($car->type == "Второй") {
                 if ($type == 1) {
@@ -96,13 +108,13 @@ class OrdersController extends Controller
                 }
                 if ($type == 5) {
                     $price += $value->price_2_4;
-                }   
+                }
             }
             if ($car->type == "Третья") {
                 if ($type == 1) {
                     $price += $value->price_3;
                 }
-                 if ($type == 2) {
+                if ($type == 2) {
                     $price += $value->price_3_1;
                 }
                 if ($type == 3) {
@@ -113,13 +125,13 @@ class OrdersController extends Controller
                 }
                 if ($type == 5) {
                     $price += $value->price_3_4;
-                }   
+                }
             }
             if ($car->type == "Четыре") {
                 if ($type == 1) {
                     $price += $value->price_4;
                 }
-                 if ($type == 2) {
+                if ($type == 2) {
                     $price += $value->price_4_1;
                 }
                 if ($type == 3) {
@@ -130,7 +142,7 @@ class OrdersController extends Controller
                 }
                 if ($type == 5) {
                     $price += $value->price_4_4;
-                }   
+                }
             }
         }
 
@@ -143,7 +155,7 @@ class OrdersController extends Controller
             $day = 'ночная';
         }
 
-        return view('pages.finish',[
+        return view('pages.finish', [
             'usluga' => $usluga,
             'type' => $type,
             'woker' => $woker,
@@ -155,7 +167,9 @@ class OrdersController extends Controller
             'arr_usl' => serialize($data)
         ]);
     }
-    public function finishpost(Request $request) {
+
+    public function finishpost(Request $request)
+    {
         $time = strtotime($request->time);
         $current = strtotime(date("H:i:s"));
         $left = $current - $time;
@@ -178,7 +192,9 @@ class OrdersController extends Controller
 
         echo $left;
     }
-    public function ordertable(Request $request) {
+
+    public function ordertable(Request $request)
+    {
 
         $time_1 = strtotime($request->time_1);
         $time_1 = date("Y-m-d H:i:s", $time_1);
@@ -186,32 +202,32 @@ class OrdersController extends Controller
         $time_2 = date("Y-m-d H:i:s", $time_2);
         $sum = false;
         if ($request->time_1 == '' && $request->time_2 == '' && $request->woker == '' && $request->client == '' && $request->time == '') {
-            $orders = Orders::orderBy('id', 'desc')->get();   
+            $orders = Orders::orderBy('id', 'desc')->get();
         } else {
             $query = DB::table('orders')->select();
             if ($request->time_1 != '') {
-                $query->where('created_at', '>=',$time_1);
+                $query->where('created_at', '>=', $time_1);
             }
             if ($request->time_2 != '') {
-                $query->where('created_at', '<=',$time_2);
+                $query->where('created_at', '<=', $time_2);
             }
             if ($request->woker != '') {
-                $query->where('work_id',$request->woker);
+                $query->where('work_id', $request->woker);
                 $sum = true;
             }
             if ($request->client != '') {
-                $query->where('client_id',$request->client);
+                $query->where('client_id', $request->client);
             }
             if ($request->time != '') {
-                $query->where('day',$request->time);
+                $query->where('day', $request->time);
             }
             $orders = $query->orderBy('id', 'desc')->get();
         }
 
         $price_woker = 0;
         if ($sum) {
-            foreach ($orders as  $value) {
-                $price_woker += $value->price; 
+            foreach ($orders as $value) {
+                $price_woker += $value->price;
             }
             $proc = Wokers::where('id', $request->woker)->first();
             $price_woker = $price_woker * ($proc->proc / 100);
@@ -224,6 +240,7 @@ class OrdersController extends Controller
         $cars = Cars::all();
         $wokers = Wokers::all();
         $uslugi = Uslugi::all();
+
         return view('pages.ordertable', [
             'orders' => $orders,
             'clients' => $client,
@@ -234,8 +251,11 @@ class OrdersController extends Controller
             'price' => $price
         ]);
     }
-    public function deleteorder(Request $request) {
+
+    public function deleteorder(Request $request)
+    {
         Orders::where('id', $request->id)->delete();
+
         return redirect()->back();
     }
 }
